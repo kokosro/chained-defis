@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import { Base } from "./Base.sol";
-import { BytesDecoder } from "./libraries/BytesDecoder.sol";
+import { Base } from "../Base.sol";
+import { BytesDecoder } from "../libraries/BytesDecoder.sol";
 
 contract FlowControl is Base {
   using BytesDecoder for bytes;
@@ -15,6 +15,11 @@ contract FlowControl is Base {
       return execute(thenInstruction);
     }
     return execute(elseInstruction);
+  }
+
+  function _halt(bytes memory reasonEncoded) public onlyOwner returns(bytes memory){
+      string memory reason = execute(reasonEncoded).toString();
+      revert(reason);
   }
   
 } 

@@ -2,6 +2,9 @@
 pragma solidity ^0.8.0;
 
 import { SafeMath } from "@openzeppelin/contracts/utils/math/SafeMath.sol";
+import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import { IERC20Metadata } from "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
+
 import { Base } from "../Base.sol";
 import { BytesDecoder } from "../libraries/BytesDecoder.sol";
 import { IMimaticVaultHolder, IcamERC20, IMimaticVaultLiquidator } from "./mimatic/Interfaces.sol";
@@ -21,7 +24,7 @@ contract Mimatic is Base {
   }
 
   function _existingVaultId(address vaultHolder) internal returns(uint256) {
-    bytess32 storageKey = _storageKeyVaultId(vaultHolder);
+    bytes32 storageKey = _storageKeyVaultId(vaultHolder);
     if(slot0KeyExists(storageKey)){
       uint256 existingVault = abi.decode(slot0Value(storageKey), (uint256));
       if(existingVault != 0){
@@ -120,18 +123,18 @@ contract Mimatic is Base {
   function _maxAvailableToBorrow(address vaultHolder) internal returns(uint256) {
     IMimaticVaultHolder vault = IMimaticVaultHolder(vaultHolder);
     uint256 vaultId = _existingVaultId(vaultHolder);
-    uint256 debtValue = holder.vaultDebt(vaultId);
-    IERC20 collateral = IERC20(vault.collateral());
-    IERC20 mai = IERC20(vault.mai());
+    uint256 debtValue = vault.vaultDebt(vaultId);
+    IERC20Metadata collateral = IERC20Metadata(vault.collateral());
+    IERC20Metadata mai = IERC20Metadata(vault.mai());
     uint256 availableToBorrow = 0;
     {
-      uint256 collateralAmount = vault.vaultCollteral(vaultId);
+      uint256 collateralAmount = vault.vaultCollateral(vaultId);
       uint256 collateralValue = collateralAmount
         .mul(vault.getEthPriceSource())
         .mul(10**(uint256(mai.decimals())
                   .sub(uint256(collateral.decimals()))));
       uint256 minCollateralPercentage = vault._minimumCollateralPercentage();
-      uint256 maxDebt = collatetralValue
+      uint256 maxDebt = collateralValue
         .mul(100)
         .div(minCollateralPercentage)
         .div(10**(uint256(vault.priceSourceDecimals())));
@@ -196,14 +199,12 @@ contract Mimatic is Base {
 
   function getMinCollateralPercentage(bytes memory vaultHolderEncoded) public onlyOwner returns(bytes memory){
     address vaultHolder = execute(vaultHolderEncoded).toAddress();
-    uint256 vaultId = _existingVaultId(vaultHolder);
     IMimaticVaultHolder vault = IMimaticVaultHolder(vaultHolder);
     return abi.encode(vault._minimumCollateralPercentage());
   }
   
   function getVaultCeiling(bytes memory vaultHolderEncoded) public onlyOwner returns(bytes memory) {
     address vaultHolder = execute(vaultHolderEncoded).toAddress();
-    uint256 vaultId = _existingVaultId(vaultHolder);
     IMimaticVaultHolder vault = IMimaticVaultHolder(vaultHolder);
     return abi.encode(vault.getDebtCeiling());
   }
@@ -245,7 +246,7 @@ contract Mimatic is Base {
       aaveToken.approve(tokenAddress, amount);
       token.enter(amount);
     }
-    return abi.encoode(amount);
+    return abi.encode(amount);
   }
 
   function unwrapCamToken(bytes memory tokenAddressEncoded, bytes memory percentageEncoded) public onlyOwner returns(bytes memory) {

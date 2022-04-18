@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 import { SafeMath } from "@openzeppelin/contracts/utils/math/SafeMath.sol";
-import { Base } from "./Base.sol";
+import { Base } from "../Base.sol";
 import { BytesDecoder } from "../libraries/BytesDecoder.sol";
 
 contract MathUint256 is Base {

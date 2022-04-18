@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "deploy-v1": "node ./scripts/deploy-v1.js",
     "ganache": "node ./scripts/start-ganache.js"
   },
   "repository": {

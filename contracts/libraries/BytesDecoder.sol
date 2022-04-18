@@ -17,5 +17,9 @@ library BytesDecoder {
   function toAddress(bytes memory b) internal pure returns(address) {
     return abi.decode(b, (address));
   }
+
+  function toString(bytes memory b) internal pure returns(string memory){
+      return abi.decode(b, (string));
+  }
   
 }
