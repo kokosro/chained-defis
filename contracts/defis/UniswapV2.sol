@@ -21,7 +21,9 @@ contract UniswapV2 is Base, IUniswapV2Callee {
       address pair;
       bytes callbackInstruction;
   }
-
+  function __version() override public pure returns(uint256) {
+    return 1;
+  }
   function _swapRouter(address routerAddress, address fromTokenAddress, address toTokenAddress, uint256 amount) internal returns(uint256) {
       IUniswapRouterV2 router = IUniswapRouterV2(routerAddress);
       IERC20 fromToken = IERC20(fromTokenAddress);
@@ -144,7 +146,7 @@ contract UniswapV2 is Base, IUniswapV2Callee {
                      bytes memory pairedTokenAddressEncoded,
                      bytes memory amountEncoded,
                      bytes memory callbackInstruction)
-      public onlyOwner
+      public 
       returns(bytes memory){
       address routerAddress = execute(routerAddressEncoded).toAddress();
       address borrowedTokenAddress = execute(borrowedTokenAddressEncoded).toAddress();

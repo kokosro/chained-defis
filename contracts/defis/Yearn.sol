@@ -13,7 +13,8 @@ import { IYearnVault } from "./yearn/Interfaces.sol";
 contract Yearn is Base {
   using SafeMath for uint256;
   using BytesDecoder for bytes;
-  constructor(){
+  function __version() override public pure returns(uint256) {
+    return 1;
   }
   function _depositToken(address vaultAddress, uint256 amount) internal returns(uint256) {
       
@@ -45,7 +46,7 @@ contract Yearn is Base {
   }
 
   
-  function depositTokenPercentage(bytes memory vaultAddressEncoded, bytes memory percentageEncoded) public onlyOwner returns(bytes memory) {
+  function depositTokenPercentage(bytes memory vaultAddressEncoded, bytes memory percentageEncoded) public  returns(bytes memory) {
       uint256 percentage = execute(percentageEncoded).toUint256();
       address vaultAddress = execute(vaultAddressEncoded).toAddress();
       require(percentage <= 100);
@@ -57,7 +58,7 @@ contract Yearn is Base {
       return abi.encode(_depositToken(vaultAddress, amount));
   }
 
-  function depositTokenAmount(bytes memory vaultAddressEncoded, bytes memory amountEncoded) public onlyOwner returns(bytes memory) {
+  function depositTokenAmount(bytes memory vaultAddressEncoded, bytes memory amountEncoded) public  returns(bytes memory) {
       uint256 amount = execute(amountEncoded).toUint256();
       address vaultAddress = execute(vaultAddressEncoded).toAddress();
       
@@ -79,7 +80,7 @@ contract Yearn is Base {
       return amount;
   }
   
-  function withdrawTokenPercentage(bytes memory vaultAddressEncoded, bytes memory percentageEncoded) public onlyOwner returns(bytes memory) {
+  function withdrawTokenPercentage(bytes memory vaultAddressEncoded, bytes memory percentageEncoded) public  returns(bytes memory) {
       uint256 percentage = execute(percentageEncoded).toUint256();
       address vaultAddress = execute(vaultAddressEncoded).toAddress();
       
@@ -93,7 +94,7 @@ contract Yearn is Base {
       return abi.encode(_withdrawToken(vaultAddress, amount));
   }
 
-  function withdrawTokenAmount(bytes memory vaultAddressEncoded, bytes memory amountEncoded) public onlyOwner returns(bytes memory) {
+  function withdrawTokenAmount(bytes memory vaultAddressEncoded, bytes memory amountEncoded) public  returns(bytes memory) {
       uint256 amount = execute(amountEncoded).toUint256();
       address vaultAddress = execute(vaultAddressEncoded).toAddress();
       

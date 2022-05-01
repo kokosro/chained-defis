@@ -9,7 +9,12 @@ async function main() {
   console.log(network);
   const [admin] = await hre.ethers.getSigners();
 
-  const coreList = ['Constant', 'FlowControl', 'MathUint256', 'ERC20',
+  const coreList = [
+    'Constant',
+    'Memory',
+    'FlowControl',
+    'MathUint256',
+    'ERC20',
     // 'ERC721'
   ];
 
@@ -27,7 +32,13 @@ async function main() {
   }
   const defis = {};
 
-  const defisList = ['Mimatic', 'UniswapV2', 'Yearn', 'Tomb'];
+  const defisList = [
+    'Mimatic',
+    'UniswapV2',
+    'Yearn',
+    'Tomb',
+    'Aave',
+  ];
 
   console.log('deploying defis');
 

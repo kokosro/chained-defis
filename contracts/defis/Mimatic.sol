@@ -12,6 +12,10 @@ import { IMimaticVaultHolder, IcamERC20, IMimaticVaultLiquidator } from "./mimat
 contract Mimatic is Base {
   using BytesDecoder for bytes;
   using SafeMath for uint256;
+
+  function __version() override public pure returns(uint256) {
+       return 1;
+  }
   
   function _storageKeyVaultId(address vaultHolder) internal pure returns(bytes32) {
     return keccak256(abi.encode(vaultHolder));
@@ -42,7 +46,7 @@ contract Mimatic is Base {
     return abi.encode(_existingVaultId(execute(vaultHolderEncoded).toAddress()));
   }
   
-  function initVaultId(bytes memory vaultHolderEncoded, bytes memory vaultIdEncoded) public onlyOwner returns(bytes memory){
+  function initVaultId(bytes memory vaultHolderEncoded, bytes memory vaultIdEncoded) public  returns(bytes memory){
     address vaultHolder = execute(vaultHolderEncoded).toAddress();
     uint256 vaultId = execute(vaultIdEncoded).toUint256();
     IMimaticVaultHolder vault = IMimaticVaultHolder(vaultHolder);
@@ -55,11 +59,11 @@ contract Mimatic is Base {
     return abi.encode(vaultId);
   }
 
-  function createVault(bytes memory vaultHolderEncoded) public onlyOwner returns(bytes memory) {
+  function createVault(bytes memory vaultHolderEncoded) public  returns(bytes memory) {
     return abi.encode(_existingVaultId(execute(vaultHolderEncoded).toAddress()));
   }
 
-  function depositCollateral(bytes memory vaultHolderEncoded, bytes memory percentageEncoded) public onlyOwner returns(bytes memory) {
+  function depositCollateral(bytes memory vaultHolderEncoded, bytes memory percentageEncoded) public  returns(bytes memory) {
     address vaultHolder = execute(vaultHolderEncoded).toAddress();
     uint256 percentage = execute(percentageEncoded).toUint256();
     require(percentage <= 100);
@@ -75,7 +79,7 @@ contract Mimatic is Base {
     return abi.encode(toDeposit);
   }
 
-  function transferVault(bytes memory vaultHolderEncoded, bytes memory nextOwnerEncoded) public onlyOwner returns(bytes memory) {
+  function transferVault(bytes memory vaultHolderEncoded, bytes memory nextOwnerEncoded) public  returns(bytes memory) {
     address vaultHolder = execute(vaultHolderEncoded).toAddress();
     address nextOwner = execute(nextOwnerEncoded).toAddress();
     uint256 vaultId = _existingVaultId(vaultHolder);
@@ -103,13 +107,13 @@ contract Mimatic is Base {
     return amount;
   }
   
-  function repayExactMai(bytes memory vaultHolderEncoded, bytes memory amountEncoded) public onlyOwner returns(bytes memory) {
+  function repayExactMai(bytes memory vaultHolderEncoded, bytes memory amountEncoded) public  returns(bytes memory) {
     address vaultHolder = execute(vaultHolderEncoded).toAddress();
     uint256 amount = execute(amountEncoded).toUint256();
     return abi.encode(_repay(vaultHolder, amount));
   }
 
-  function repayMai(bytes memory vaultHolderEncoded, bytes memory percentageEncoded) public onlyOwner returns(bytes memory) {
+  function repayMai(bytes memory vaultHolderEncoded, bytes memory percentageEncoded) public  returns(bytes memory) {
     address vaultHolder = execute(vaultHolderEncoded).toAddress();
     uint256 percentage = execute(percentageEncoded).toUint256();
     require(percentage <= 100);
@@ -162,13 +166,13 @@ contract Mimatic is Base {
     
   }
 
-  function borrowExactMai(bytes memory vaultHolderEncoded, bytes memory amountEncoded) public onlyOwner returns(bytes memory) {
+  function borrowExactMai(bytes memory vaultHolderEncoded, bytes memory amountEncoded) public  returns(bytes memory) {
     address vaultHolder = execute(vaultHolderEncoded).toAddress();
     uint256 amount = execute(amountEncoded).toUint256();
     return abi.encode(_borrow(vaultHolder, amount));
   }
   
-  function borrowMai(bytes memory vaultHolderEncoded, bytes memory percentageEncoded) public onlyOwner returns(bytes memory) {
+  function borrowMai(bytes memory vaultHolderEncoded, bytes memory percentageEncoded) public  returns(bytes memory) {
     address vaultHolder = execute(vaultHolderEncoded).toAddress();
     uint256 percentage = execute(percentageEncoded).toUint256();
     uint256 maxAvailable = _maxAvailableToBorrow(vaultHolder);
@@ -176,40 +180,40 @@ contract Mimatic is Base {
     return abi.encode(_borrow(vaultHolder, amount));
   }
   
-  function getDebt(bytes memory vaultHolderEncoded) public onlyOwner returns(bytes memory) {
+  function getDebt(bytes memory vaultHolderEncoded) public  returns(bytes memory) {
     address vaultHolder = execute(vaultHolderEncoded).toAddress();
     uint256 vaultId = _existingVaultId(vaultHolder);
     IMimaticVaultHolder vault = IMimaticVaultHolder(vaultHolder);
     return abi.encode(vault.vaultDebt(vaultId));
   }
 
-  function getCollateral(bytes memory vaultHolderEncoded) public onlyOwner returns(bytes memory) {
+  function getCollateral(bytes memory vaultHolderEncoded) public  returns(bytes memory) {
     address vaultHolder = execute(vaultHolderEncoded).toAddress();
     uint256 vaultId = _existingVaultId(vaultHolder);
     IMimaticVaultHolder vault = IMimaticVaultHolder(vaultHolder);
     return abi.encode(vault.vaultCollateral(vaultId));
   }
 
-  function getCollateralPercentage(bytes memory vaultHolderEncoded) public onlyOwner returns(bytes memory) {
+  function getCollateralPercentage(bytes memory vaultHolderEncoded) public  returns(bytes memory) {
     address vaultHolder = execute(vaultHolderEncoded).toAddress();
     uint256 vaultId = _existingVaultId(vaultHolder);
     IMimaticVaultHolder vault = IMimaticVaultHolder(vaultHolder);
     return abi.encode(vault.checkCollateralPercentage(vaultId));
   }
 
-  function getMinCollateralPercentage(bytes memory vaultHolderEncoded) public onlyOwner returns(bytes memory){
+  function getMinCollateralPercentage(bytes memory vaultHolderEncoded) public  returns(bytes memory){
     address vaultHolder = execute(vaultHolderEncoded).toAddress();
     IMimaticVaultHolder vault = IMimaticVaultHolder(vaultHolder);
     return abi.encode(vault._minimumCollateralPercentage());
   }
   
-  function getVaultCeiling(bytes memory vaultHolderEncoded) public onlyOwner returns(bytes memory) {
+  function getVaultCeiling(bytes memory vaultHolderEncoded) public  returns(bytes memory) {
     address vaultHolder = execute(vaultHolderEncoded).toAddress();
     IMimaticVaultHolder vault = IMimaticVaultHolder(vaultHolder);
     return abi.encode(vault.getDebtCeiling());
   }
 
-  function liquidate(bytes memory vaultHolderEncoded, bytes memory vaultIdEncoded) public onlyOwner returns(bytes memory) {
+  function liquidate(bytes memory vaultHolderEncoded, bytes memory vaultIdEncoded) public  returns(bytes memory) {
     address vaultHolder = execute(vaultHolderEncoded).toAddress();
     uint256 vaultId = execute(vaultIdEncoded).toUint256();
     IMimaticVaultHolder vault = IMimaticVaultHolder(vaultHolder);
@@ -235,7 +239,7 @@ contract Mimatic is Base {
     return abi.encode(false);
   }
   
-  function wrapCamToken(bytes memory tokenAddressEncoded, bytes memory percentageEncoded) public onlyOwner returns(bytes memory) {
+  function wrapCamToken(bytes memory tokenAddressEncoded, bytes memory percentageEncoded) public  returns(bytes memory) {
     address tokenAddress = execute(tokenAddressEncoded).toAddress();
     uint256 percentage = execute(percentageEncoded).toUint256();
     IcamERC20 token = IcamERC20(tokenAddress);
@@ -249,7 +253,7 @@ contract Mimatic is Base {
     return abi.encode(amount);
   }
 
-  function unwrapCamToken(bytes memory tokenAddressEncoded, bytes memory percentageEncoded) public onlyOwner returns(bytes memory) {
+  function unwrapCamToken(bytes memory tokenAddressEncoded, bytes memory percentageEncoded) public  returns(bytes memory) {
     address tokenAddress = execute(tokenAddressEncoded).toAddress();
     uint256 percentage = execute(percentageEncoded).toUint256();
     IcamERC20 token = IcamERC20(tokenAddress);

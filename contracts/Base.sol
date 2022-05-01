@@ -3,9 +3,9 @@ pragma solidity ^0.8.0;
 
 import { Storage } from "./Storage.sol";
 import { Receiveable } from "./Receiveable.sol";
-import { Destroyable } from "./Destroyable.sol";
+import { Operable } from "./Operable.sol";
 
-contract Base is Storage, Receiveable, Destroyable {
+contract Base is Storage, Receiveable, Operable {
   address private currentExecutionTarget;
   bytes4 private registeredCallback;
   address private registeredCallbackSender;
@@ -38,7 +38,7 @@ contract Base is Storage, Receiveable, Destroyable {
     registeredCallbackBlock = 0;
   }
   
-  function execute(bytes memory executionInformation) public onlyOwner returns(bytes memory){
+  function execute(bytes memory executionInformation) public onlyOperator returns(bytes memory){
     
     if(executionInformation.length == 0){
       return new bytes(0);

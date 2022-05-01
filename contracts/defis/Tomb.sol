@@ -13,7 +13,9 @@ import { ITombMasonary } from "./tomb/Interfaces.sol";
 contract Tomb is Base {
   using SafeMath for uint256;
   using BytesDecoder for bytes;
-
+  function __version() override public pure returns(uint256) {
+    return 1;
+  }
   function _claimAvailableRewards(address masonaryAddress) internal returns(uint256) {
       ITombMasonary masonary = ITombMasonary(masonaryAddress);
       if(masonary.canClaimReward(address(this))){
@@ -29,7 +31,7 @@ contract Tomb is Base {
       return 0;
   }
   
-  function claimAvailableRewards(bytes memory masonaryAddressEncoded) public onlyOwner returns(bytes memory){
+  function claimAvailableRewards(bytes memory masonaryAddressEncoded) public  returns(bytes memory){
       address masonaryAddress = execute(masonaryAddressEncoded).toAddress();
       return abi.encode(_claimAvailableRewards(masonaryAddress));
       
@@ -90,7 +92,7 @@ contract Tomb is Base {
       return amount;
   }
   
-  function stakeSharesPercentage(bytes memory masonaryAddressEncoded, bytes memory percentageEncoded) public onlyOwner returns(bytes memory) {
+  function stakeSharesPercentage(bytes memory masonaryAddressEncoded, bytes memory percentageEncoded) public  returns(bytes memory) {
       address masonaryAddress = execute(masonaryAddressEncoded).toAddress();
       uint256 percentage = execute(percentageEncoded).toUint256();
       ITombMasonary masonary = ITombMasonary(masonaryAddress);
@@ -104,7 +106,7 @@ contract Tomb is Base {
       return abi.encode(_stakeShares(masonaryAddress, amount));
   }
 
-  function stakeSharesAmount(bytes memory masonaryAddressEncoded, bytes memory amountEncoded) public onlyOwner returns(bytes memory) {
+  function stakeSharesAmount(bytes memory masonaryAddressEncoded, bytes memory amountEncoded) public  returns(bytes memory) {
       address masonaryAddress = execute(masonaryAddressEncoded).toAddress();
 
       uint256 amount = execute(amountEncoded).toUint256();
@@ -129,7 +131,7 @@ contract Tomb is Base {
       return amount;
   }
   
-  function unstakeSharesPercentage(bytes memory masonaryAddressEncoded, bytes memory percentageEncoded) public onlyOwner returns(bytes memory) {
+  function unstakeSharesPercentage(bytes memory masonaryAddressEncoded, bytes memory percentageEncoded) public  returns(bytes memory) {
       address masonaryAddress = execute(masonaryAddressEncoded).toAddress();
       uint256 percentage = execute(percentageEncoded).toUint256();
       
@@ -140,7 +142,7 @@ contract Tomb is Base {
       return abi.encode(_unstakeShares(masonaryAddress, amount));
   }
 
-  function unstakeSharesAmount(bytes memory masonaryAddressEncoded, bytes memory amountEncoded) public onlyOwner returns(bytes memory) {
+  function unstakeSharesAmount(bytes memory masonaryAddressEncoded, bytes memory amountEncoded) public  returns(bytes memory) {
       address masonaryAddress = execute(masonaryAddressEncoded).toAddress();
       uint256 amount = execute(amountEncoded).toUint256();
 
@@ -164,7 +166,7 @@ contract Tomb is Base {
       abi.encode(_canBuyBonds(treasuryAddress));
   }
   
-  function buyBondsPercentage(bytes memory treasuryAddressEncoded, bytes memory percentageEncoded) public onlyOwner (bytes memory) {
+  function buyBondsPercentage(bytes memory treasuryAddressEncoded, bytes memory percentageEncoded) public  (bytes memory) {
       address treasuryAddress = execute(treasuryAddressEncoded).toAddress();
       ITombTreasury treasury = ITombTreasury(treasuryAddress);
       
