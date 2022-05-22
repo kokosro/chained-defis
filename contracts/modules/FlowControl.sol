@@ -10,7 +10,7 @@ contract FlowControl is Base {
     return 1;
   }
   function _if(bytes memory conditionInstruction, bytes memory thenInstruction, bytes memory elseInstruction) public returns(bytes memory){
-    bool conditionResponse = execute(conditionInstruction).toBool();
+    bool conditionResponse = execute(conditionInstruction).to_bool();
     if(conditionResponse) {
       return execute(thenInstruction);
     }
@@ -18,7 +18,7 @@ contract FlowControl is Base {
   }
 
   function _halt(bytes memory reasonEncoded) public returns(bytes memory){
-      string memory reason = execute(reasonEncoded).toString();
+      string memory reason = execute(reasonEncoded).to_string();
       revert(reason);
   }
 
