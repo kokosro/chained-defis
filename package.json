@@ -4,6 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "compile": "./node_modules/hardhat/internal/cli/cli.js compile ",
+    "force-compile": "./node_modules/hardhat/internal/cli/cli.js compile --force",
     "deploy-v1": "node ./scripts/deploy-v1.js",
     "ganache": "node ./scripts/start-ganache.js"
   },
