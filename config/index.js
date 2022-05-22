@@ -1,7 +1,6 @@
 require('dotenv').config();
 const convict = require('convict');
-const fs = require('fs');
-const path = require('path');
+const { ethers } = require('ethers');
 
 const lowerCaseString = {
   name: 'lowercase-string',
@@ -9,16 +8,25 @@ const lowerCaseString = {
   coerce: (val) => val.toLowerCase(),
 };
 
-const accountsFormat = {
-  name: 'accounts',
+const accountsFromMnemonic = {
+  name: 'accounts-from-mnemonic',
   validate: (val) => true,
   coerce: (val) => {
-    const addressesKeys = val.split(',');
+    const mnemonic = !val ? ethers.Wallet.createRandom().mnemonic.phrase : val;
+
+    const addressesKeys = [];
+    const ACCOUNTS_COUNT = parseInt(process.env.ACCOUNTS_COUNT || 100, 10);
+    for (let i = 0; i < ACCOUNTS_COUNT; i++) {
+      const wallet = ethers.Wallet.fromMnemonic(mnemonic, `m/44'/60'/0'/0/${i}`);
+
+      addressesKeys.push(`${wallet.privateKey}`);
+    }
+
     return addressesKeys.filter((x) => !!x);
   },
 };
 
-convict.addFormat(accountsFormat);
+convict.addFormat(accountsFromMnemonic);
 convict.addFormat(lowerCaseString);
 
 const config = convict({
@@ -33,10 +41,20 @@ const config = convict({
       default: 'http://localhost:8545',
       env: 'PROVIDER_HTTP',
     },
+    mnemonic: {
+      format: String,
+      default: 'ride move coyote bird bulb rate rally library goat height artefact lion',
+      env: 'ACCOUNT_MNEMONIC',
+    },
+    accountsCount: {
+      format: 'nat',
+      default: 10,
+      env: 'ACCOUNTS_COUNT',
+    },
     accounts: {
-      format: 'accounts',
-      default: [],
-      env: 'ACCOUNTS',
+      format: 'accounts-from-mnemonic',
+      default: 'ride move coyote bird bulb rate rally library goat height artefact lion',
+      env: 'ACCOUNT_MNEMONIC',
     },
     providerHttpHardhat: {
       format: String,
@@ -73,18 +91,6 @@ const config = convict({
 
 config.validate({ allowed: 'strict' });
 
-convict.initDev = () => {
-  if (config.get('network.name') == 'development') {
-    if (fs.existsSync('./ganache-accounts')) {
-      const privateKeys = fs.readFileSync('./ganache-accounts', { encoding: 'utf8' }).split(',').map((k) => k.trim());
-      config.set('network.accounts', privateKeys);
-    }
-  }
-  return config.get('network.accounts');
-};
-
 config.isHardhat = () => config.get('network.name') == 'hardhat';
-
-convict.initDev();
 
 module.exports = config;

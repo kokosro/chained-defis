@@ -1,42 +1,34 @@
 const ganache = require('ganache-cli');
-const fs = require('fs');
 const { ethers } = require('ethers');
+const config = require('../config');
 
 const GANACHE_PORT = parseInt(process.env.PORT || 8545);
 const INITIAL_BALANCE = ethers.utils.parseUnits('10000000.0', 'ether').toHexString();
 
 const generateAccounts = (count = 1) => {
-  if (fs.existsSync('./ganache-accounts')) {
-    const accountsPrivateKeys = fs.readFileSync('./ganache-accounts', { encoding: 'utf8' }).split(',').map((pk) => pk.trim());
+  const privateKeys = config.get('network.accounts');
 
-    console.log(`
------------------------------ accounts ---------------------------
-${accountsPrivateKeys.join('\n')}
-------------------------------------------------------------------
-`);
-    return accountsPrivateKeys.map((pk) => ({
-      secretKey: pk,
-      balance: INITIAL_BALANCE,
-    }));
+  const wallets = [];
+  for (let i = 0; i < count; i++) {
+    const wallet = new ethers.Wallet(privateKeys[i]);
+    wallets.push(wallet);
   }
-  const accounts = Array(count).fill(0).map(() => {
-    const wallet = ethers.Wallet.createRandom();
-    return {
-      secretKey: wallet.privateKey,
-      balance: INITIAL_BALANCE,
-    };
-  });
+  const accounts = wallets.map((wallet) => ({
+    secretKey: wallet.privateKey,
+    balance: INITIAL_BALANCE,
+    address: wallet.address,
+  }));
   const accountsPrivateKeys = accounts.map(({ secretKey }) => secretKey);
-  fs.writeFileSync('./ganache-accounts', accountsPrivateKeys.join(','), { encoding: 'utf8' });
+
   console.log(`
 ----------------------------- accounts ---------------------------
-${accountsPrivateKeys.join('\n')}
+${accounts.map(({ address, secretKey }) => `${address}: ${secretKey}`).join('\n')}
 ------------------------------------------------------------------
 `);
   return accounts;
 };
 
-const GANACHE_ACCOUNTS = generateAccounts(10);
+const GANACHE_ACCOUNTS = generateAccounts(config.get('network.accountsCount'));
 
 const startGanache = () => {
   const server = ganache.server({
