@@ -44,5 +44,7 @@ First argument is always an `Instruction` that outputs the address of the end co
 
 Wrappers can be auto generated from their abi using
 
-`npm run generate ContractName ./path/to/abi/ContractName.json ./path/to/where/the/wrapper/will/be/generated/WrapperContractName.sol`
+```sh
+npm run generate ContractName ./path/to/abi/ContractName.json ./path/to/where/the/wrapper/will/be/generated/WrapperContractName.sol
+```
 
