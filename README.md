@@ -24,12 +24,17 @@ struct Instruction {
 ```
 
 `InstructionType.SELF` - will `delegatecall` to `target`
+
 `InstructionType.EXTERNAL` - will `call` `target`
 
 `version` - `target` should respond with corresponding `version` ( `target.__version()` )
+
 `data` - data to call `target` with
+
 `value` - native amount to call `target` with
+
 `next` - next instruction that should be executed after this. When `next` is empty the execution ends
+
 
 ## Wrappers
 
