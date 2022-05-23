@@ -6,14 +6,14 @@ import { Receiveable } from "./Receiveable.sol";
 import { Operable } from "./Operable.sol";
 
 contract Base is Storage, Receiveable, Operable {
-  address private currentExecutionTarget;
+  address private currentInstructionTarget;
   bytes4 private registeredCallback;
   address private registeredCallbackSender;
   uint256 private registeredCallbackBlock;
-  enum ExecutionType { SELF, EXTERNAL }
+  enum InstructionType { SELF, EXTERNAL }
   
-  struct Execution {
-    ExecutionType _type;
+  struct Instruction {
+    InstructionType _type;
     uint256 value;
     address target;
     string name;
@@ -38,35 +38,35 @@ contract Base is Storage, Receiveable, Operable {
     registeredCallbackBlock = 0;
   }
   
-  function execute(bytes memory executionInformation) public onlyOperator returns(bytes memory){
+  function execute(bytes memory instructionInformation) public onlyOperator returns(bytes memory){
     
-    if(executionInformation.length == 0){
+    if(instructionInformation.length == 0){
       return new bytes(0);
     }
        
-    Execution memory execution = abi.decode(executionInformation, (Execution));
+    Instruction memory instruction = abi.decode(instructionInformation, (Instruction));
     bool success;
     bytes memory resultData;
-    require(Base(payable(execution.target)).__version() == execution.version, "Invalid target version");
+    require(Base(payable(instruction.target)).__version() == instruction.version, "Invalid target version");
     
-    currentExecutionTarget = execution.target;
+    currentInstructionTarget = instruction.target;
     
-    if(execution._type == ExecutionType.SELF){
+    if(instruction._type == InstructionType.SELF){
       _setWritePriviledge(address(this));
       (success, resultData) =
-        execution.target.delegatecall(execution.data);
-      require(success, string(abi.encodePacked(execution.name," failed call 1")));
-      currentExecutionTarget = address(0);
-    } else if ( execution._type == ExecutionType.EXTERNAL ) {
-      _setWritePriviledge(execution.target);
-      (success, resultData) = execution.target.call{ value: execution.value }(execution.data);
+        instruction.target.delegatecall(instruction.data);
+      require(success, string(abi.encodePacked(instruction.name," failed call 1")));
+      currentInstructionTarget = address(0);
+    } else if ( instruction._type == InstructionType.EXTERNAL ) {
+      _setWritePriviledge(instruction.target);
+      (success, resultData) = instruction.target.call{ value: instruction.value }(instruction.data);
       require(success, "failed execution 2");
-      currentExecutionTarget = address(0);
+      currentInstructionTarget = address(0);
     } else {
-      revert("unknown execution type");
+      revert("unknown instruction type");
     }
-    if(execution.next.length > 0){
-      return execute(execution.next);
+    if(instruction.next.length > 0){
+      return execute(instruction.next);
     }
    
     return abi.decode(resultData, (bytes));
@@ -76,14 +76,14 @@ contract Base is Storage, Receiveable, Operable {
     if(msg.sig == registeredCallback
        && msg.sender == registeredCallbackSender
        && block.number == registeredCallbackBlock){
-      address cet = currentExecutionTarget;
-      if(currentExecutionTarget != address(0)){
+      address cit = currentInstructionTarget;
+      if(currentInstructionTarget != address(0)){
         unregisterCallback();
         assembly {
           // copy function selector and any arguments
           calldatacopy(0, 0, calldatasize())
            // execute function call using current executor
-            let result := delegatecall(gas(), cet, 0, calldatasize(), 0, 0)
+            let result := delegatecall(gas(), cit, 0, calldatasize(), 0, 0)
             // get any return value
             returndatacopy(0, 0, returndatasize())
             // return any return value or error back to the caller
