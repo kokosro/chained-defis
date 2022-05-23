@@ -7,7 +7,11 @@
     "compile": "./node_modules/hardhat/internal/cli/cli.js compile ",
     "force-compile": "./node_modules/hardhat/internal/cli/cli.js compile --force",
     "deploy-v1": "node ./scripts/deploy-v1.js",
-    "ganache": "node ./scripts/start-ganache.js"
+    "ganache": "node ./scripts/start-ganache.js",
+    "generate": "node ./scripts/generate-protocol-wrap.js",
+    "init-solhint": "./node_modules/.bin/solhint init-config",
+    "solhint": "./node_modules/.bin/solhint -f table contracts/**/*.sol contracts/**/**/*.sol contracts/**/**/**/*.sol contracts/*.sol",
+    "prettier:solidity": "./node_modules/.bin/prettier --write contracts/**/*.sol contracts/**/**/*.sol contracts/**/**/**/*.sol contracts/*.sol"
   },
   "repository": {
     "type": "git",
@@ -23,7 +27,12 @@
     "eslint": "^8.13.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-plugin-import": "^2.26.0",
-    "ganache-cli": "^6.12.2"
+    "ganache-cli": "^6.12.2",
+    "husky": "^7.0.4",
+    "prettier": "^2.6.2",
+    "prettier-plugin-solidity": "^1.0.0-beta.19",
+    "solhint": "^3.3.7",
+    "solhint-plugin-prettier": "0.0.5"
   },
   "dependencies": {
     "@ethersproject/experimental": "^5.6.0",
@@ -36,5 +45,10 @@
     "ethers": "^5.6.4",
     "hardhat": "^2.9.3",
     "solc": "^0.8.13"
+  },
+  "husky": {
+    "hooks": {
+      "pre-push": "npm run prettier:solidity"
+    }
   }
 }
