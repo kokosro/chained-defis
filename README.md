@@ -6,7 +6,7 @@ Programable wallet that can interact with multiple defi protocols with off-chain
 
 ## How it works
 
-## Execution
+## Instructions
 
 ```solidity
 enum InstructionType { SELF, EXTERNAL }
